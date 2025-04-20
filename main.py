@@ -1,0 +1,65 @@
+import requests
+
+
+def fetch_data_from_api():
+    """This function fetches data from the API."""
+    api_key = "05tc3hKebxY7ckKz2pP8kA==x8KUa85LA30Jf4xu"
+    api_url = "https://api.api-ninjas.com/v1/animals?name=Fox"
+
+    headers = {"X-Api-Key": api_key}
+    response = requests.get(api_url, headers=headers)
+
+    if response.status_code == 200:
+        return response.json()
+    else:
+        raise Exception(f"API Error {response.status_code}: {response.text}")
+
+
+def serialize_animal(animal_obj):
+    """This function serializes a single animal object into HTML."""
+    name_diet_location_type = ''
+    name_diet_location_type += '<li class="cards__item">\n'  # List item tag instead of <article>
+    name_diet_location_type += f'<header><h2 class="card__title">{animal_obj["name"]}</h2></header>\n'
+    name_diet_location_type += f'<section class="card__content">\n'
+    name_diet_location_type += f'<p><strong>Diet: </strong>{animal_obj["characteristics"]["diet"]}</p>\n'
+    name_diet_location_type += f'<p><strong>Location: </strong>{animal_obj["locations"][0]}</p>\n'
+    if "type" in animal_obj["characteristics"]:
+        name_diet_location_type += f'<p><strong>Type: </strong>{animal_obj["characteristics"]["type"]}</p>\n'
+    name_diet_location_type += '</section>\n'
+    name_diet_location_type += '</li>\n'  # Close the <li> tag instead of <article>
+    return name_diet_location_type
+
+
+def get_animal_info(animals_list):
+    """This function returns the animal's name, diet, location, and if available, type in HTML format."""
+    name_diet_loc_type = "<ul>"  # Start with an unordered list
+    for animal in animals_list:
+        name_diet_loc_type += serialize_animal(animal)
+    name_diet_loc_type += "</ul>"  # Close the unordered list
+    return name_diet_loc_type
+
+
+def read_html(file_path, formatted_data):
+    """This function reads the HTML template file and replaces the placeholder with formatted data."""
+    with open(file_path, "r", encoding='utf-8') as file:
+        animals_template_content = file.read()
+        actual_animal_data = animals_template_content.replace("__REPLACE_ANIMALS_INFO__", formatted_data)
+        return actual_animal_data
+
+
+def write_html(file_path, new_content):
+    """This function writes new content into the HTML file."""
+    with open(file_path, "w", encoding='utf-8') as file:
+        file.write(new_content)
+
+
+def main():
+    """This function fetches animal data from the API, inserts it into the HTML template, and writes the result to a new HTML file."""
+    animals_data = fetch_data_from_api()
+    formatted_data = get_animal_info(animals_data)
+    filled_animal_template = read_html("animals_template.html", formatted_data)
+    write_html("new_animals_template.html", filled_animal_template)
+
+
+if __name__ == "__main__":
+    main()
