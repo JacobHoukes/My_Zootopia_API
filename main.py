@@ -1,10 +1,10 @@
 import requests
 
 
-def fetch_data_from_api():
-    """This function fetches data from the API."""
+def fetch_data_from_api(animal_name="Fox"):
+    """This function fetches data from the API based on the animal name."""
     api_key = "05tc3hKebxY7ckKz2pP8kA==x8KUa85LA30Jf4xu"
-    api_url = "https://api.api-ninjas.com/v1/animals?name=Fox"
+    api_url = f"https://api.api-ninjas.com/v1/animals?name={animal_name}"
 
     headers = {"X-Api-Key": api_key}
     response = requests.get(api_url, headers=headers)
@@ -42,8 +42,8 @@ def get_animal_info(animals_list):
 def read_html(file_path, formatted_data):
     """This function reads the HTML template file and replaces the placeholder with formatted data."""
     with open(file_path, "r", encoding='utf-8') as file:
-        animals_template_content = file.read()
-        actual_animal_data = animals_template_content.replace("__REPLACE_ANIMALS_INFO__", formatted_data)
+        html_template = file.read()
+        actual_animal_data = html_template.replace("__REPLACE_ANIMALS_INFO__", formatted_data)
         return actual_animal_data
 
 
