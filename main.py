@@ -1,22 +1,4 @@
-import requests
-
-
-def fetch_data_from_api():
-    """This function fetches data from the API based on the animal name."""
-    query = input("Enter a name of an animal: ").strip().lower()
-    api_key = "05tc3hKebxY7ckKz2pP8kA==x8KUa85LA30Jf4xu"
-    api_url = f"https://api.api-ninjas.com/v1/animals?name={query}"
-
-    headers = {"X-Api-Key": api_key}
-    response = requests.get(api_url, headers=headers)
-
-    if response.status_code == 200:
-        data = response.json()
-        if not data:
-            print("No exact matches found. Try using a more specific animal name.")
-        return data
-    else:
-        raise Exception(f"API Error {response.status_code}: {response.text}")
+import data_fetcher
 
 
 def serialize_animal(animal_obj):
@@ -59,10 +41,16 @@ def write_html(file_path, new_content):
 
 def main():
     """This function fetches animal data from the API, inserts it into the HTML template, and writes the result to a new HTML file."""
-    animals_data = fetch_data_from_api()
-    formatted_data = get_animal_info(animals_data)
-    filled_animal_template = read_html("animals_template.html", formatted_data)
-    write_html("animals.html", filled_animal_template)
+    animal_name = input("Please enter an animal: ").strip()
+    data = data_fetcher.fetch_data(animal_name)
+
+    if data:
+        formatted_data = get_animal_info(data)
+    else:
+        formatted_data = f'<h2 style="color:red;">The animal "{animal_name}" doesn\'t exist.</h2>'
+
+    filled_template = read_html("animals_template.html", formatted_data)
+    write_html("animals.html", filled_template)
     print("Website was successfully generated to the file animals.html.")
 
 
